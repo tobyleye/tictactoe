@@ -1,5 +1,5 @@
 import shortid from "shortid";
-import { Server, Socket } from "socket.io";
+import { DisconnectReason, Server, Socket } from "socket.io";
 import { PlayerMark, Player } from "./types";
 import { initBoardSquares, determineResult } from "./utils";
 
@@ -87,7 +87,7 @@ export class Room {
       round: this.currentRound,
       nextPlayer: this.nextPlayer,
     });
-    socket.broadcast.emit("playerJoined", players);
+    socket.broadcast.to(this.roomId).emit("playerJoined", players);
     if (this.host && this.guest) {
       if (!this.nextPlayer) {
         this.nextPlayer = this.host;
@@ -161,8 +161,15 @@ export class Room {
       }
     };
 
-    const handleLeave = () => {
+    const handleLeave = (reason: DisconnectReason | "self" = "self") => {
       socket.leave(this.roomId);
+
+      console.log("player leaving..", {
+        socket: socket.id,
+        host: this.host,
+        guest: this.guest,
+      });
+
       let playerLeaving;
       if (this.host && this.host.id === socket.id) {
         playerLeaving = this.host;
@@ -172,9 +179,18 @@ export class Room {
         this.guest = null;
       }
 
-      console.log("player is leaving..", playerLeaving?.mark);
-      this.broadcast("playerLeave", playerLeaving);
+      console.log("player leaving..", {
+        playerLeaving,
+      });
+
+      socket.broadcast
+        .to(this.roomId)
+        .emit("playerLeave", playerLeaving, reason);
+
       socket.off("play", handlePlay);
+      socket.off("leaveRoom", handleLeave);
+      socket.off("disconnect", handleLeave);
+
       // if a player leaves while the game is ongoing, delete the game
       if (this.gameStarted === true && this.roomId !== "public") {
         rooms.delete(this.roomId);

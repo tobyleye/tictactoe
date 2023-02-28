@@ -1,14 +1,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
-
-const getLeaderboard = async () => {
-  const resp = await fetch("http://localhost:5201/leaderboard");
-  if (!resp.ok) {
-    throw new Error(`fetch error ${resp.status}`);
-  }
-  const data = await resp.json();
-  return data;
-};
+import { getLeaderboard } from "@/api";
 
 const formatNum = (num: number) => {
   return num.toLocaleString();

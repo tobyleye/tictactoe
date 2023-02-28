@@ -3,6 +3,7 @@ import { Modal } from "./Modal";
 import { CopyButton } from "./CopyButton";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Spinner } from "./Spinner";
 
 const Countdown = ({ onComplete }: { onComplete: () => void }) => {
   const [count, setCount] = useState(3);
@@ -46,7 +47,9 @@ export function RoomLoading({
   return (
     <Modal open={true}>
       {loadingRoom ? (
-        <div>spinner...</div>
+        <div>
+          <Spinner />
+        </div>
       ) : startCountdown ? (
         <Countdown onComplete={onStart} />
       ) : player && player.isHost ? (

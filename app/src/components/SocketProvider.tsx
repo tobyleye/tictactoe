@@ -1,14 +1,13 @@
 import { createContext, useState } from "react";
 import { io, Socket } from "socket.io-client";
-
-const connURI = "localhost:5201";
+import { SERVER_BASE_URL } from "@/config";
 
 export const SocketContext = createContext<{ socket: Socket }>({
-  socket: io(connURI),
+  socket: io(SERVER_BASE_URL),
 });
 
 export default function SocketProvider({ children }: { children: any }) {
-  const [socket] = useState(() => io(connURI));
+  const [socket] = useState(() => io(SERVER_BASE_URL));
 
   return (
     <SocketContext.Provider value={{ socket }}>

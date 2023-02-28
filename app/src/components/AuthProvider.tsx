@@ -1,5 +1,6 @@
 import { useSession, signIn, signOut } from "next-auth/react";
 import { ReactNode, createContext, useEffect, useState } from "react";
+import { signIn as loadUser } from "@/api";
 
 import { Spinner } from "./Spinner";
 
@@ -17,19 +18,6 @@ export const AuthContext = createContext<{
   signOut: () => {},
 });
 
-const remoteSignIn = async (user: any) => {
-  const body = JSON.stringify({ user });
-  const response = await fetch("http://localhost:5201/signin", {
-    method: "post",
-    body: body,
-    headers: {
-      "content-type": "application/json",
-    },
-  });
-  const data = await response.json();
-  return data;
-};
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { data: session, status } = useSession();
   const [isFetchingUser, setIsFetchingUser] = useState(false);
@@ -37,21 +25,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [fetchingUserError, setIsFetchingUserError] = useState(false);
 
   useEffect(() => {
-    const loadUser = async (user: any) => {
-      try {
-        setIsFetchingUser(true);
-        const data = await remoteSignIn(user);
-        setUser(data.user);
-      } catch (err) {
-        setIsFetchingUserError(true);
-      } finally {
-        setIsFetchingUser(false);
+    (async () => {
+      if (session && session.user) {
+        try {
+          setIsFetchingUser(true);
+          const data = await loadUser(session.user);
+          setUser(data.user);
+        } catch (err) {
+          setIsFetchingUserError(true);
+        } finally {
+          setIsFetchingUser(false);
+        }
       }
-    };
-    // load user
-    if (session && session.user) {
-      loadUser(session.user);
-    }
+    })();
   }, [session]);
 
   const isLoading = status === "loading" || isFetchingUser;

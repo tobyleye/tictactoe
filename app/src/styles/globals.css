@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .button {
+    @apply inline-block border border-gray-300 px-4 py-2 rounded-md no-underline  hover:opacity-90 transition-all;
+  }
+
+  .button-purple {
+    @apply bg-appPurple border-appPurple text-white hover:opacity-90 transition-all;
+  }
+}

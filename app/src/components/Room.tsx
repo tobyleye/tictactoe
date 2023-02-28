@@ -1,4 +1,4 @@
-import { FC, ReactNode, useContext, useEffect, useRef, useState } from "react";
+import { FC, useContext, useEffect, useRef, useState } from "react";
 import { SocketContext } from "./SocketProvider";
 import { Hud } from "./Hud";
 import { BoardWrapper } from "./Board/BoardWrapper";
@@ -9,6 +9,8 @@ import { GameResult } from "./GameResult";
 import { RoomLoading } from "./RoomLoading";
 import { withAuth } from "@/hocs/withAuth";
 import { LeaveRoom } from "./LeaveRoom";
+import { useRouter } from "next/router";
+import { PlayerDisconnected } from "./PlayerDisconnected";
 
 const emptyBoardSquares = () => Array(9).fill(undefined);
 
@@ -20,7 +22,6 @@ const Room: FC<{ id: string }> = ({ id }) => {
 
   const [connected, setConnected] = useState(() => socket.connected);
   const [startGame, setStartGame] = useState(false);
-  const [showShare, setShowShare] = useState(false);
   const [boardSquares, setBoardSquares] = useState(() => emptyBoardSquares());
   const [nextPlayer, setNextPlayer] = useState<Player | null>(null);
   const [result, setResult] = useState<null | "draw" | [PlayerMark, number[]]>(
@@ -32,6 +33,7 @@ const Room: FC<{ id: string }> = ({ id }) => {
   const [round, setRound] = useState(1);
   const [settingUp, setSettingUp] = useState(true);
   const nextRoundStateRef = useRef<any>(null);
+  const router = useRouter();
 
   useEffect(() => {
     setLoadingRoom(true);
@@ -75,7 +77,6 @@ const Room: FC<{ id: string }> = ({ id }) => {
       },
       startGame: (nextPlayer: any) => {
         // setStartGame(true);
-        setShowShare(false);
         setNextPlayer(nextPlayer);
       },
       updateBoard: (squares: any[]) => {
@@ -105,18 +106,37 @@ const Room: FC<{ id: string }> = ({ id }) => {
   }, [socket, id]);
 
   const [playerDisconnectInfo, setPlayerDisconnectInfo] = useState<null | {
-    player: Player;
+    player: Player | null;
     reason: string;
   }>(null);
 
   useEffect(() => {
     const unregister = registerEvents(socket, {
-      playerLeave: (player, reason) => {
-        setPlayerDisconnectInfo({ player, reason });
+      playerLeave: (playerLeaving, reason) => {
+        if (startGame) {
+          setPlayerDisconnectInfo({
+            player: playerLeaving,
+            reason: reason,
+          });
+        }
       },
     });
     return unregister;
-  }, [socket, id, connected]);
+  }, [socket, startGame]);
+
+  useEffect(() => {
+    const unregister = registerEvents(socket, {
+      disconnect: (reason) => {
+        if (startGame && player) {
+          setPlayerDisconnectInfo({
+            player: null,
+            reason: reason,
+          });
+        }
+      },
+    });
+    return unregister;
+  }, [socket, startGame, player]);
 
   const handleSquareClick = (index: number) => {
     if (nextPlayer && player && nextPlayer.mark !== player.mark) {
@@ -142,7 +162,7 @@ const Room: FC<{ id: string }> = ({ id }) => {
   };
 
   const handleLeave = () => {
-    console.log("leave..");
+    router.push("/");
   };
 
   return (
@@ -159,7 +179,8 @@ const Room: FC<{ id: string }> = ({ id }) => {
         />
       )}
 
-      {gameOver && <GameResult />}
+      <GameResult gameOver={gameOver} players={players!} player={player!} />
+      <PlayerDisconnected info={playerDisconnectInfo} />
 
       {startGame && (
         <div className="h-full flex flex-col ">
@@ -167,17 +188,10 @@ const Room: FC<{ id: string }> = ({ id }) => {
             <LeaveRoom onLeave={handleLeave} />
           </header>
           <div className="flex-1 grid place-items-center py-4 relative">
-            <div className="absolute right-0 w-64 h-64 border border-white bg-white text-gray-800 overflow-auto">
-              {JSON.stringify({
-                players,
-                player,
-                boardSquares,
-              })}
-            </div>
             {showRoundResult ? (
               <RoundResult
                 result={result}
-                player={player as Player}
+                player={player!}
                 onAnimationEnd={startNextRound}
               />
             ) : (
@@ -191,16 +205,14 @@ const Room: FC<{ id: string }> = ({ id }) => {
               />
             )}
           </div>
-          <div className="border-t-2 border-gray-600" id="footer">
-            {players && player ? (
-              <Hud
-                round={round}
-                nextPlayer={nextPlayer as Player}
-                players={players as Player[]}
-                player={player as Player}
-              />
-            ) : null}
-          </div>
+          <footer className="border-t-2 border-gray-600" id="footer">
+            <Hud
+              round={round}
+              nextPlayer={nextPlayer!}
+              players={players!}
+              player={player!}
+            />
+          </footer>
         </div>
       )}
     </div>
