@@ -1,6 +1,9 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import Head from "next/head";
+import { SessionProvider } from "next-auth/react";
+import { AuthProvider } from "@/components/AuthProvider";
+import SocketProvider from "@/components/SocketProvider";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -11,7 +14,15 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Component {...pageProps} />
+      <SocketProvider>
+        <SessionProvider session={pageProps.session}>
+          <AuthProvider>
+            <div className="absolute top-0 left-0 bottom-0 right-0 overflow-auto bg-gray-900 text-gray-200">
+              <Component {...pageProps} />
+            </div>
+          </AuthProvider>
+        </SessionProvider>
+      </SocketProvider>
     </>
   );
 }
