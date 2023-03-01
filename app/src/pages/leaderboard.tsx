@@ -56,7 +56,7 @@ export default function Leaderboard() {
 
   return (
     <div className="h-full overflow-auto">
-      <div className="max-w-md mx-auto pt-20 px-4">
+      <div className="max-w-md mx-auto pt-10  md:pt-20 px-4">
         <div className="mb-4">
           <Link href="/">
             <BiArrowBack className="text-3xl" />
