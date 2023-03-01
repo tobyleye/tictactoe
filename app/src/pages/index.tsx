@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { Signin } from "@/components/Signin";
 import { Header } from "@/components/HomeHeader";
+import { MdLeaderboard } from "react-icons/md";
 
 export default function Home() {
   const [playerMark, setPlayerMark] = useState("");
@@ -35,19 +36,25 @@ export default function Home() {
             {!user ? (
               <Signin />
             ) : (
-              <div>
+              <div className="max-w-sm w-full mx-auto">
                 <PlayerMarkSelect value={playerMark} onChange={setPlayerMark} />
                 <div className="mt-6">
                   <button
                     disabled={!playerMark}
                     onClick={handlePlay}
-                    className="bg-[#9995f3] py-3 font-semibold  max-w-sm w-full   rounded text-white disabled:opacity-50"
+                    className="button-purple py-3 w-full"
                   >
                     Play
                   </button>
                 </div>
-                <div className="mt-4">
-                  <Link href="/leaderboard">Leaderboard</Link>
+                <div className="mt-8">
+                  <Link
+                    href="/leaderboard"
+                    className="inline-flex  text-xl items-center gap-2"
+                  >
+                    <MdLeaderboard />
+                    <span>Leaderboard</span>
+                  </Link>
                 </div>
               </div>
             )}

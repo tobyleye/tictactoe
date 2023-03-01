@@ -1,6 +1,29 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "@/components/AuthProvider";
 import { useSpring, animated } from "@react-spring/web";
+import { BiChevronDown } from "react-icons/bi";
+
+function Avatar({ avatar, name }: { avatar: string; name: string }) {
+  let initials = name
+    .split(/\s/g)
+    .map((each) => each[0])
+    .slice(0, 2)
+    .join("");
+
+  console.log({ initials });
+  return (
+    <div
+      className="w-10 h-10 rounded-full bg-gray-200  bg-no-repeat bg-cover bg-center"
+      style={{
+        backgroundImage: `url(${avatar})`,
+      }}
+    >
+      <div className="w-full h-full grid place-items-center">
+        <span className="text-gray-800 text-xl">{initials}</span>
+      </div>
+    </div>
+  );
+}
 
 function UserMenu({ user }: { user: any }) {
   const [showMenu, setShowMenu] = useState(false);
@@ -40,17 +63,15 @@ function UserMenu({ user }: { user: any }) {
   return (
     <div className="relative">
       <button ref={triggerRef} onClick={toggleMenu}>
-        <div
-          className="w-10 h-10 rounded-full bg-gray-200  bg-no-repeat bg-cover bg-center"
-          style={{
-            backgroundImage: `url(${user.avatar})`,
-          }}
-        />
+        <div className="flex items-end">
+          <Avatar avatar={user.avatar} name={user.name} />
+          <BiChevronDown className="text-2xl ml-1" />
+        </div>
       </button>
       {showMenu && (
         <animated.div
           style={spring}
-          className="absolute top-[100%] -left-[100px] bg-white text-gray-800 rounded-lg px-2 py-2"
+          className="absolute top-[120%] -left-[100px] bg-white text-gray-800 rounded-lg px-2 py-2"
         >
           <div>
             <button
@@ -82,7 +103,7 @@ function UserMenu({ user }: { user: any }) {
 
 export function Header() {
   const { user, signIn } = useContext(AuthContext);
-
+  console.log({ user });
   if (!user) return null;
   return (
     <header className="absolute top-0 left-0 right-0">

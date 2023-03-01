@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getLeaderboard } from "@/api";
+import { Spinner } from "@/components/Spinner";
+import { MdLeaderboard } from "react-icons/md";
+import { useSpring, animated } from "@react-spring/web";
+import { BiArrowBack } from "react-icons/bi";
 
 const formatNum = (num: number) => {
   return num.toLocaleString();
@@ -8,7 +12,15 @@ const formatNum = (num: number) => {
 
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
-
+  const slideSpring = useSpring({
+    from: {
+      y: "100%",
+    },
+    to: {
+      y: "0%",
+    },
+    delay: 80,
+  });
   useEffect(() => {
     getLeaderboard()
       .then((data) => {
@@ -44,21 +56,32 @@ export default function Leaderboard() {
 
   return (
     <div className="h-full overflow-auto">
-      <div className="max-w-md mx-auto pt-20 px-8">
+      <div className="max-w-md mx-auto pt-20 px-4">
         <div className="mb-4">
-          <Link href="/" className="text-xl">
-            Back
+          <Link href="/">
+            <BiArrowBack className="text-3xl" />
           </Link>
         </div>
-        <h3 className="text-3xl mb-8 font-bold text-center">Leaderboard</h3>
+        <h3 className="text-3xl leading-[40px] mb-8 font-bold text-center flex justify-center items-center gap-2 ">
+          <div className="overflow-hidden">
+            <animated.div style={slideSpring}>
+              <MdLeaderboard />
+            </animated.div>
+          </div>
+          Leaderboard
+        </h3>
         <div className="">
           {leaderboard.length > 0 ? (
             <ol className="grid gap-4">{renderList()}</ol>
           ) : (
-            <div className="text-center">loading..</div>
+            <div className="text-center py-4">
+              <Spinner />
+            </div>
           )}
         </div>
       </div>
     </div>
   );
 }
+
+// 2 minutes 10 seconds

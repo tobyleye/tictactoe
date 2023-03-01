@@ -8,6 +8,6 @@
   }
 
   .button-purple {
-    @apply bg-appPurple border-appPurple text-white hover:opacity-90 transition-all;
+    @apply bg-appPurple border-appPurple rounded font-semibold text-white hover:opacity-90 transition-all disabled:opacity-50;
   }
 }

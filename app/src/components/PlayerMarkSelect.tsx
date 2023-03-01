@@ -43,7 +43,7 @@ export function PlayerMarkSelect({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="text-gray-200 py-6 px-4 rounded-lg max-w-sm mx-auto bg-gray-800 shadow-lg">
+    <div className="text-gray-200 py-6 px-4 rounded-lg bg-gray-800 shadow-lg">
       <p className="mb-6 font-medium text-xl">Pick your mark</p>
       <div className="flex bg-gray-900 py-2 px-2 rounded-lg">
         <Radio
