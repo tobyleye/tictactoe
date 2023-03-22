@@ -22,10 +22,6 @@ type Square = {
 
 type Point = [number | null, number | null];
 
-type BoardEvents = {
-  click: (index: number) => void;
-};
-
 const BOARD_MAX_SIZE = 440;
 
 export class Board extends EventEmitter {
@@ -77,9 +73,6 @@ export class Board extends EventEmitter {
     this.canvas.addEventListener("mouseenter", this.handleHover);
     this.canvas.addEventListener("click", this.handleClick);
     this.canvas.addEventListener("mouseout", this.handleMouseOut);
-
-    this.on("updateSquares", this.updateSquareLabels.bind(this));
-    this.on("drawWinningLine", this.drawLine.bind(this));
   }
 
   destroyEvents = () => {
