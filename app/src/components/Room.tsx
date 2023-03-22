@@ -7,7 +7,6 @@ import { registerEvents } from "@/socketUtils";
 import { RoundResult } from "./RoundResult";
 import { GameResult } from "./GameResult";
 import { RoomLoading } from "./RoomLoading";
-import { withAuth } from "@/hocs/withAuth";
 import { LeaveRoom } from "./LeaveRoom";
 import { useRouter } from "next/router";
 import { PlayerDisconnected } from "./PlayerDisconnected";
@@ -219,4 +218,4 @@ const Room: FC<{ id: string }> = ({ id }) => {
   );
 };
 
-export default withAuth(Room);
+export default Room;
