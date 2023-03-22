@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Board } from "./classes/Board";
 import { useSpring, animated } from "@react-spring/web";
 
@@ -14,7 +14,7 @@ export function BoardWrapper({
   onFinishDrawingWinningLine?: () => void;
 }) {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
-  const boardRef = useRef<Board | null>(null);
+  const [board, setBoard] = useState<Board | null>(null);
 
   const spring = useSpring({
     from: {
@@ -25,55 +25,45 @@ export function BoardWrapper({
     },
   });
 
-  const getBoard = (cb: (board: Board) => any) => {
-    const board = boardRef.current;
-    if (!board) {
-      return;
-    }
-    return cb(board);
-  };
-
   useEffect(() => {
     if (canvas) {
-      boardRef.current = new Board(canvas);
+      const board = new Board(canvas);
+      setBoard(board);
       return () => {
-        boardRef.current?.destroyEvents();
+        board.destroyEvents();
       };
     }
   }, [canvas]);
 
   useEffect(() => {
-    const cleanup = getBoard((board) => {
-      board.on("click", (index: number) => {
-        onSquareClick?.(index);
-      });
-      return () => {
-        board.off("click");
-      };
+    if (!board) return;
+    board.on("click", (index: number) => {
+      onSquareClick?.(index);
     });
 
-    return cleanup;
-  }, [onSquareClick, canvas]);
+    return () => {
+      board.off("click");
+    };
+  }, [onSquareClick, board]);
 
   useEffect(() => {
+    if (!board) return;
+
     if (winningScenario && winningScenario.length === 3) {
-      const cleanup = getBoard((board) => {
-        board.emit("drawWinningLine", winningScenario, () => {
-          // done drawing
-          setTimeout(() => {
-            onFinishDrawingWinningLine?.();
-          }, 600);
-        });
+      board.drawLine(winningScenario, () => {
+        // done drawing
+        setTimeout(() => {
+          onFinishDrawingWinningLine?.();
+        }, 600);
       });
-      return cleanup;
     }
-  }, [winningScenario, onFinishDrawingWinningLine, canvas]);
+  }, [winningScenario, onFinishDrawingWinningLine, board]);
 
   useEffect(() => {
-    getBoard((board) => {
-      board.emit("updateSquares", squares);
-    });
-  }, [squares, canvas]);
+    if (!board) return;
+
+    board.updateSquareLabels(squares);
+  }, [squares, board]);
 
   return (
     <animated.div style={spring}>
