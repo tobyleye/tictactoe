@@ -164,12 +164,6 @@ export class Room {
     const handleLeave = (reason: DisconnectReason | "self" = "self") => {
       socket.leave(this.roomId);
 
-      console.log("player leaving..", {
-        socket: socket.id,
-        host: this.host,
-        guest: this.guest,
-      });
-
       let playerLeaving;
       if (this.host && this.host.id === socket.id) {
         playerLeaving = this.host;
@@ -178,10 +172,6 @@ export class Room {
         playerLeaving = this.guest;
         this.guest = null;
       }
-
-      console.log("player leaving..", {
-        playerLeaving,
-      });
 
       socket.broadcast
         .to(this.roomId)

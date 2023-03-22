@@ -20,11 +20,3 @@ export class EventEmitter {
     delete this.events[event];
   }
 }
-
-const emitter = new EventEmitter();
-// emitter.on('')
-
-type Person = { name: string };
-type Male = { eyes: number };
-
-type Female = Person & Male;
