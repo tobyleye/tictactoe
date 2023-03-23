@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { SERVER_BASE_URL } from "@/config";
 
@@ -14,4 +14,8 @@ export default function SocketProvider({ children }: { children: any }) {
       {children}
     </SocketContext.Provider>
   );
+}
+
+export function useSocket() {
+  return useContext(SocketContext).socket;
 }

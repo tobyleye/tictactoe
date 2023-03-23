@@ -1,5 +1,5 @@
-import { FC, useContext, useEffect, useRef, useState } from "react";
-import { SocketContext } from "./SocketProvider";
+import { FC, useEffect, useRef, useState } from "react";
+import { useSocket } from "./SocketProvider";
 import { Hud } from "./Hud";
 import { BoardWrapper } from "./Board/BoardWrapper";
 import { Player, PlayerMark } from "@/types";
@@ -14,7 +14,7 @@ import { PlayerDisconnected } from "./PlayerDisconnected";
 const emptyBoardSquares = () => Array(9).fill(undefined);
 
 const Room: FC<{ id: string }> = ({ id }) => {
-  const { socket } = useContext(SocketContext);
+  const socket = useSocket();
   const [player, setPlayer] = useState<Player | null>(null);
   const [players, setPlayers] = useState<any[] | null>(null);
   const [loadingRoom, setLoadingRoom] = useState(false);
@@ -75,7 +75,6 @@ const Room: FC<{ id: string }> = ({ id }) => {
         setPlayers(players);
       },
       startGame: (nextPlayer: any) => {
-        // setStartGame(true);
         setNextPlayer(nextPlayer);
       },
       updateBoard: (squares: any[]) => {
@@ -169,7 +168,6 @@ const Room: FC<{ id: string }> = ({ id }) => {
       {settingUp && (
         <RoomLoading
           player={player}
-          players={players}
           loadingRoom={loadingRoom}
           onStart={() => {
             setSettingUp(false);

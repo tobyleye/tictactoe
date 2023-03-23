@@ -4,6 +4,8 @@ import { CopyButton } from "./CopyButton";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Spinner } from "./Spinner";
+import { registerEvents } from "@/socketUtils";
+import { useSocket } from "./SocketProvider";
 
 const Countdown = ({ onComplete }: { onComplete: () => void }) => {
   const [count, setCount] = useState(3);
@@ -33,17 +35,23 @@ const Countdown = ({ onComplete }: { onComplete: () => void }) => {
 export function RoomLoading({
   player,
   loadingRoom,
-  players,
   onStart,
 }: {
   player: Player | null;
-  players: null | any[];
   loadingRoom: boolean;
   onStart: () => void;
 }) {
-  const startCountdown = players && players.every((player) => player !== null);
+  const [startCountdown, setStartCountdown] = useState(false);
+  const socket = useSocket();
 
-  console.log("players:", players);
+  useEffect(() => {
+    const unregister = registerEvents(socket, {
+      startGame() {
+        setStartCountdown(true);
+      },
+    });
+    return unregister;
+  }, [socket]);
   return (
     <Modal open={true}>
       {loadingRoom ? (
