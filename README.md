@@ -1,6 +1,7 @@
 # Tictactoe
 
 A multiplayer tictactoe game
+![game screenshot](https://raw.githubusercontent.com/tobyleye/tictactoe/main/shot1.png)
 
 ## Tech
 
