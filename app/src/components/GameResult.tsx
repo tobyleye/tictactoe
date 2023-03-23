@@ -40,7 +40,6 @@ export function GameResult({
             <div className="flex justify-center mb-4">
               <div className="relative text-8xl font-bold">{player.mark}</div>
             </div>
-            <div className="text-2xl text-green-400 mb-10">+ 5 score</div>
           </div>
         ) : (
           <div>
